@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-isagen-blue: #004A8F;
+  --color-isagen-light-blue: #0062B8;
+  --color-isagen-green: #7AB800;
+  --color-isagen-dark: #1A2E35;
+  --font-heading: "Montserrat", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+/* Transiciones fluidas entre diapositivas */
+.slide-fade-enter-active {
+    transition: all 0.4s ease-out;
+}
+.slide-fade-leave-active {
+    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.slide-fade-enter-from {
+    transform: translateX(30px);
+    opacity: 0;
+}
+.slide-fade-leave-to {
+    transform: translateX(-30px);
+    opacity: 0;
+}
