@@ -64,6 +64,7 @@ import SlideEtapasIA from './components/SlideEtapasIA.vue';
 import SlideEstadoArte from './components/SlideEstadoArte.vue';
 import SlideEstadoLLM from './components/SlideEstadoLLM.vue';
 import SlideContextoLLM from './components/SlideContextoLLM.vue';
+import SlideRAG from './components/SlideRAG.vue';
 import SlideCierre from './components/SlideCierre.vue';
 
 export default {
@@ -79,6 +80,7 @@ export default {
     SlideEstadoArte,
     SlideEstadoLLM,
     SlideContextoLLM,
+    SlideRAG,
     SlideCierre
   },
   data() {
@@ -92,10 +94,11 @@ export default {
         'SlideSolucionProbabilistica', 
         'SlideHistoriaIA', 
         'SlideTransformers',
+        'SlideContextoLLM',
+        'SlideRAG',
         'SlideEtapasIA', 
         'SlideEstadoArte', 
         'SlideEstadoLLM',
-        'SlideContextoLLM',
         'SlideCierre'
       ]
     }
