@@ -59,6 +59,7 @@ import SlideEquipo from './components/SlideEquipo.vue';
 import SlideProblemaGato from './components/SlideProblemaGato.vue';
 import SlideSolucionProbabilistica from './components/SlideSolucionProbabilistica.vue';
 import SlideHistoriaIA from './components/SlideHistoriaIA.vue';
+import SlideTransformers from './components/SlideTransformers.vue';
 import SlideEtapasIA from './components/SlideEtapasIA.vue';
 import SlideEstadoArte from './components/SlideEstadoArte.vue';
 import SlideEstadoLLM from './components/SlideEstadoLLM.vue';
@@ -73,6 +74,7 @@ export default {
     SlideProblemaGato,
     SlideSolucionProbabilistica,
     SlideHistoriaIA,
+    SlideTransformers,
     SlideEtapasIA,
     SlideEstadoArte,
     SlideEstadoLLM,
@@ -89,6 +91,7 @@ export default {
         'SlideProblemaGato', 
         'SlideSolucionProbabilistica', 
         'SlideHistoriaIA', 
+        'SlideTransformers',
         'SlideEtapasIA', 
         'SlideEstadoArte', 
         'SlideEstadoLLM',

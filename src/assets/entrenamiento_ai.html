@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Entrenamiento IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --panel-bg: #1e1e1e;
+            --border-color: #333;
+            --accent: #4ade80;
+            --accent-hover: #22c55e;
+            --secondary: #a855f7;
+            --token-bg: #2d2d2d;
+            --weight-base: #000000;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f5f5f5;
+            --text-color: #121212;
+            --panel-bg: #ffffff;
+            --border-color: #cccccc;
+            --accent: #16a34a;
+            --accent-hover: #15803d;
+            --secondary: #9333ea;
+            --token-bg: #e5e5e5;
+            --weight-base: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            font-family: 'VT323', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            font-size: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 4px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        button {
+            font-family: 'VT323', monospace;
+            background-color: var(--panel-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 8px 16px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0px var(--border-color);
+        }
+
+        button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--border-color);
+        }
+
+        button.primary {
+            background-color: var(--accent);
+            color: #111;
+            border-color: #111;
+            box-shadow: 4px 4px 0px #111;
+        }
+        
+        button.primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--panel-bg);
+            border: 4px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            font-family: 'VT323', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 8px;
+            font-size: 1.2rem;
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab {
+            opacity: 0.5;
+        }
+
+        .tab.active {
+            opacity: 1;
+            border-color: var(--accent);
+        }
+
+        .visualization {
+            border: 2px dashed var(--border-color);
+            min-height: 400px;
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            overflow: hidden;
+        }
+
+        /* Elements */
+        .stage-title {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: var(--border-color);
+            font-size: 1.5rem;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            min-height: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .token {
+            background-color: var(--token-bg);
+            border: 2px solid var(--border-color);
+            padding: 10px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+
+        .token.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .vector {
+            display: grid;
+            grid-template-columns: repeat(4, 10px);
+            grid-template-rows: repeat(4, 10px);
+            gap: 2px;
+            opacity: 0;
+        }
+
+        .vector.visible {
+            opacity: 1;
+        }
+
+        .pixel {
+            background-color: var(--border-color);
+            transition: background-color 0.5s;
+        }
+
+        .network-node {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            font-size: 1.2rem;
+            opacity: 0;
+            position: relative;
+        }
+
+        .network-node.visible {
+            opacity: 1;
+        }
+
+        .weights-matrix {
+            display: grid;
+            grid-template-columns: repeat(12, 15px);
+            grid-template-rows: repeat(6, 15px);
+            gap: 2px;
+            margin: 0 auto;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            background-color: var(--weight-base);
+        }
+
+        .weight-pixel {
+            background-color: var(--border-color);
+            transition: background-color 0.2s;
+        }
+
+        /* SVG Lines */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        path {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 2;
+            stroke-dasharray: 5;
+            animation: dash 1s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        path.active {
+            opacity: 1;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -10; }
+        }
+
+        .log {
+            font-size: 1.1rem;
+            color: var(--accent);
+            min-height: 1.5em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>[ Training_Sim.exe ]</h1>
+        <button id="themeToggle">Modo Claro</button>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <input type="text" id="inputText" value="La IA aprende patrones" placeholder="Escribe una oración corta...">
+            <div class="tabs">
+                <button class="tab active" id="btnRNN">Pre-Transformer (RNN)</button>
+                <button class="tab" id="btnTransformer">Transformer</button>
+            </div>
+            <button class="primary" id="btnTrain">▶ INICIAR ENTRENAMIENTO</button>
+        </div>
+
+        <div class="log" id="statusLog">Esperando input...</div>
+
+        <div class="visualization" id="visArea">
+            <span class="stage-title" id="stageTitle">Arquitectura: RNN (Secuencial)</span>
+            
+            <svg id="svgLines"></svg>
+
+            <!-- Tokens Text -->
+            <div class="row" id="tokensRow"></div>
+            
+            <!-- Vectors -->
+            <div class="row" id="vectorsRow"></div>
+            
+            <!-- Network Processing Area -->
+            <div class="row" id="networkRow"></div>
+            
+            <!-- Weights -->
+            <div style="text-align: center;">MATRIZ DE PESOS (CONOCIMIENTO)</div>
+            <div class="weights-matrix" id="weightsMatrix">
+                <!-- Se llenará con JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State ---
+        let mode = 'rnn'; // 'rnn' or 'transformer'
+        let isTraining = false;
+        
+        // --- DOM Elements ---
+        const themeToggle = document.getElementById('themeToggle');
+        const inputText = document.getElementById('inputText');
+        const btnRNN = document.getElementById('btnRNN');
+        const btnTransformer = document.getElementById('btnTransformer');
+        const btnTrain = document.getElementById('btnTrain');
+        const tokensRow = document.getElementById('tokensRow');
+        const vectorsRow = document.getElementById('vectorsRow');
+        const networkRow = document.getElementById('networkRow');
+        const weightsMatrix = document.getElementById('weightsMatrix');
+        const statusLog = document.getElementById('statusLog');
+        const stageTitle = document.getElementById('stageTitle');
+        const svgLines = document.getElementById('svgLines');
+
+        // --- Theme Logic ---
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? 'Modo Claro' : 'Modo Oscuro';
+            updateWeightColors();
+        });
+
+        // --- Tab Logic ---
+        btnRNN.addEventListener('click', () => setMode('rnn'));
+        btnTransformer.addEventListener('click', () => setMode('transformer'));
+
+        function setMode(newMode) {
+            if(isTraining) return;
+            mode = newMode;
+            btnRNN.classList.toggle('active', mode === 'rnn');
+            btnTransformer.classList.toggle('active', mode === 'transformer');
+            stageTitle.textContent = mode === 'rnn' ? 'Arquitectura: RNN (Secuencial)' : 'Arquitectura: Transformer (Paralelo + Atención)';
+            resetVis();
+        }
+
+        // --- Init Weights ---
+        function initWeights() {
+            weightsMatrix.innerHTML = '';
+            for(let i=0; i<72; i++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'weight-pixel';
+                weightsMatrix.appendChild(pixel);
+            }
+            updateWeightColors();
+        }
+
+        function updateWeightColors() {
+            const pixels = document.querySelectorAll('.weight-pixel');
+            const theme = document.documentElement.getAttribute('data-theme');
+            pixels.forEach(p => {
+                if(!p.hasAttribute('data-active')) {
+                    p.style.backgroundColor = 'var(--border-color)';
+                }
+            });
+        }
+
+        // --- Reset ---
+        function resetVis() {
+            tokensRow.innerHTML = '';
+            vectorsRow.innerHTML = '';
+            networkRow.innerHTML = '';
+            svgLines.innerHTML = '';
+            initWeights();
+            statusLog.textContent = 'Esperando input...';
+        }
+
+        // --- Utils ---
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+        function createVectorHTML() {
+            let html = '<div class="vector">';
+            for(let i=0; i<16; i++) {
+                const r = Math.floor(Math.random() * 255);
+                const g = Math.floor(Math.random() * 255);
+                const b = Math.floor(Math.random() * 255);
+                html += `<div class="pixel" style="background-color: rgb(${r},${g},${b})"></div>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function drawLine(el1, el2, id, type='straight') {
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+            const svgRect = svgLines.getBoundingClientRect();
+
+            const x1 = rect1.left + rect1.width/2 - svgRect.left;
+            const y1 = rect1.top + rect1.height/2 - svgRect.top;
+            const x2 = rect2.left + rect2.width/2 - svgRect.left;
+            const y2 = rect2.top + rect2.height/2 - svgRect.top;
+
+            let d = '';
+            if (type === 'curve') {
+                d = `M ${x1} ${y1} Q ${(x1+x2)/2} ${y1 - 50}, ${x2} ${y2}`;
+            } else {
+                d = `M ${x1} ${y1} L ${x2} ${y2}`;
+            }
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", d);
+            path.setAttribute("id", id);
+            svgLines.appendChild(path);
+        }
+
+        function updateWeightsRandomly(count) {
+            const pixels = document.querySelectorAll('.weight-pixel');
+            for(let i=0; i<count; i++) {
+                const idx = Math.floor(Math.random() * pixels.length);
+                const val = Math.random();
+                const color = `rgba(74, 222, 128, ${val})`; // Accent color alpha
+                pixels[idx].style.backgroundColor = color;
+                pixels[idx].setAttribute('data-active', 'true');
+            }
+        }
+
+        // --- Training Logic ---
+        btnTrain.addEventListener('click', async () => {
+            if(isTraining) return;
+            isTraining = true;
+            btnTrain.style.opacity = '0.5';
+            resetVis();
+
+            const words = inputText.value.trim().split(/\s+/).filter(w => w.length > 0);
+            if(words.length === 0) {
+                isTraining = false;
+                btnTrain.style.opacity = '1';
+                return;
+            }
+
+            // 1. Tokenization (Shared)
+            statusLog.textContent = 'Paso 1: Tokenizando el texto...';
+            for(let w of words) {
+                const t = document.createElement('div');
+                t.className = 'token';
+                t.textContent = w;
+                tokensRow.appendChild(t);
+                await sleep(200);
+                t.classList.add('visible');
+            }
+            await sleep(800);
+
+            // 2. Embedding (Shared)
+            statusLog.textContent = 'Paso 2: Convirtiendo tokens a vectores (Embeddings)...';
+            const tokens = document.querySelectorAll('.token');
+            for(let i=0; i<tokens.length; i++) {
+                vectorsRow.insertAdjacentHTML('beforeend', createVectorHTML());
+                const vec = vectorsRow.lastChild;
+                await sleep(100);
+                vec.classList.add('visible');
+            }
+            await sleep(800);
+
+            // 3. Architecture Specific Processing
+            if (mode === 'rnn') {
+                await runRNN(tokens.length);
+            } else {
+                await runTransformer(tokens.length);
+            }
+
+            statusLog.textContent = '¡Entrenamiento completado! Pesos actualizados.';
+            isTraining = false;
+            btnTrain.style.opacity = '1';
+        });
+
+        async function runRNN(count) {
+            const vectors = document.querySelectorAll('.vector');
+            
+            // Create single RNN Cell
+            const rnnCell = document.createElement('div');
+            rnnCell.className = 'network-node';
+            rnnCell.textContent = 'RNN';
+            networkRow.appendChild(rnnCell);
+            await sleep(300);
+            rnnCell.classList.add('visible');
+
+            statusLog.textContent = 'Paso 3: Procesamiento Secuencial. El contexto es un cuello de botella.';
+            
+            for(let i=0; i<count; i++) {
+                svgLines.innerHTML = ''; // Clear previous lines
+                
+                // Draw line from vector to RNN
+                drawLine(vectors[i], rnnCell, `line-v-${i}`);
+                await sleep(100);
+                document.getElementById(`line-v-${i}`).classList.add('active');
+                
+                // Animate processing
+                rnnCell.style.transform = 'scale(1.2)';
+                rnnCell.style.borderColor = 'var(--accent)';
+                statusLog.textContent = `Procesando token ${i+1}/${count}... (Estado Oculto actualizado)`;
+                
+                await sleep(600);
+                
+                // Update weights sequentially
+                updateWeightsRandomly(5);
+                
+                rnnCell.style.transform = 'scale(1)';
+                rnnCell.style.borderColor = 'var(--secondary)';
+                
+                // Draw self-loop for hidden state transfer if not last
+                if (i < count - 1) {
+                    // Simulate hidden state passing to next step
+                    rnnCell.style.backgroundColor = 'rgba(168, 85, 247, 0.2)';
+                }
+                
+                await sleep(600);
+            }
+        }
+
+        async function runTransformer(count) {
+            const vectors = document.querySelectorAll('.vector');
+            
+            // Create Attention Blocks
+            for(let i=0; i<count; i++) {
+                const attn = document.createElement('div');
+                attn.className = 'network-node';
+                attn.textContent = 'ATTN';
+                networkRow.appendChild(attn);
+                await sleep(100);
+                attn.classList.add('visible');
+            }
+            
+            const attnBlocks = document.querySelectorAll('.network-node');
+            
+            await sleep(500);
+            statusLog.textContent = 'Paso 3: Mecanismo de Auto-Atención. Todas las palabras se "miran" al mismo tiempo.';
+
+            // Draw Attention Lines (Every block to every other block)
+            for(let i=0; i<count; i++) {
+                drawLine(vectors[i], attnBlocks[i], `line-up-${i}`);
+                document.getElementById(`line-up-${i}`).classList.add('active');
+            }
+
+            await sleep(800);
+
+            // Draw cross attention
+            let lineIdx = 0;
+            for(let i=0; i<count; i++) {
+                for(let j=0; j<count; j++) {
+                    if (i !== j) {
+                        drawLine(attnBlocks[i], attnBlocks[j], `line-cross-${lineIdx}`, 'curve');
+                        document.getElementById(`line-cross-${lineIdx}`).classList.add('active');
+                        lineIdx++;
+                    }
+                }
+            }
+
+            // Animate processing all at once
+            attnBlocks.forEach(b => {
+                b.style.transform = 'scale(1.2)';
+                b.style.borderColor = 'var(--accent)';
+                b.style.backgroundColor = 'rgba(74, 222, 128, 0.2)';
+            });
+
+            await sleep(1200);
+
+            // Massive parallel weight update
+            statusLog.textContent = 'Actualización masiva y paralela de pesos...';
+            updateWeightsRandomly(count * 10);
+            
+            attnBlocks.forEach(b => {
+                b.style.transform = 'scale(1)';
+                b.style.borderColor = 'var(--secondary)';
+            });
+        }
+
+        // Initialize
+        initWeights();
+    </script>
+</body>
+</html>
