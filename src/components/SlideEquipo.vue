@@ -15,10 +15,10 @@
           <img src="../assets/yuly.jpeg" alt="Yuly" class="w-40 h-40 rounded-full object-cover border-4 border-white shadow-lg mb-6 z-10" />
           
           <h3 class="text-3xl font-bold text-gray-800 mb-1">Yuly</h3>
-          <p class="text-sm font-bold text-green-600 uppercase tracking-widest mb-6">Consultora GRC & Emprendedora</p>
+          <p class="text-sm font-bold text-green-600 uppercase tracking-widest mb-6">Consultora GRCA & Emprendedora</p>
           
           <p class="text-gray-600 leading-relaxed text-base md:text-lg px-2">
-            Con <strong>+16 años de experiencia</strong>, ayuda a los negocios a nacer y crecer de forma escalable, ética y sostenible. Especialista en <span class="text-gray-800 font-semibold">Gobierno Corporativo, Gestión de Riesgos, Cumplimiento y Control Interno</span>, integrando innovación para maximizar el valor económico y el impacto social y ambiental.
+            Con <strong>+20 años de experiencia</strong>, ayuda a los negocios a nacer y crecer de forma escalable, ética y sostenible. Especialista en <span class="text-gray-800 font-semibold">Gobierno Corporativo, Gestión de Riesgos, Cumplimiento, Control Interno y Auditoría</span>, integrando innovación para maximizar el valor económico y el impacto social y ambiental.
           </p>
         </div>
         
